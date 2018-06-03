@@ -1,6 +1,6 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
-using SuiteSparse.CHOLMOD
+using SuiteSparseNext.CHOLMOD
 using DelimitedFiles
 using Test
 using Serialization
@@ -228,7 +228,7 @@ end
 
 ## The struct pointer must be constructed by the library constructor and then modified afterwards to checks that the method throws
 @testset "illegal dtype (for now but should be supported at some point)" begin
-    p = ccall((:cholmod_l_allocate_sparse, :libcholmod), Ptr{CHOLMOD.C_SparseVoid},
+    p = ccall((:cholmod_l_allocate_sparse, CHOLMOD.libcholmod), Ptr{CHOLMOD.C_SparseVoid},
         (Csize_t, Csize_t, Csize_t, Cint, Cint, Cint, Cint, Ptr{Cvoid}),
         1, 1, 1, true, true, 0, CHOLMOD.REAL, CHOLMOD.common_struct)
     puint = convert(Ptr{UInt32}, p)
@@ -237,7 +237,7 @@ end
 end
 
 @testset "illegal dtype" begin
-    p = ccall((:cholmod_l_allocate_sparse, :libcholmod), Ptr{CHOLMOD.C_SparseVoid},
+    p = ccall((:cholmod_l_allocate_sparse, CHOLMOD.libcholmod), Ptr{CHOLMOD.C_SparseVoid},
         (Csize_t, Csize_t, Csize_t, Cint, Cint, Cint, Cint, Ptr{Cvoid}),
         1, 1, 1, true, true, 0, CHOLMOD.REAL, CHOLMOD.common_struct)
     puint = convert(Ptr{UInt32}, p)
@@ -246,7 +246,7 @@ end
 end
 
 @testset "illegal xtype" begin
-    p = ccall((:cholmod_l_allocate_sparse, :libcholmod), Ptr{CHOLMOD.C_SparseVoid},
+    p = ccall((:cholmod_l_allocate_sparse, CHOLMOD.libcholmod), Ptr{CHOLMOD.C_SparseVoid},
         (Csize_t, Csize_t, Csize_t, Cint, Cint, Cint, Cint, Ptr{Cvoid}),
         1, 1, 1, true, true, 0, CHOLMOD.REAL, CHOLMOD.common_struct)
     puint = convert(Ptr{UInt32}, p)
@@ -255,7 +255,7 @@ end
 end
 
 @testset "illegal itype I" begin
-    p = ccall((:cholmod_l_allocate_sparse, :libcholmod), Ptr{CHOLMOD.C_SparseVoid},
+    p = ccall((:cholmod_l_allocate_sparse, CHOLMOD.libcholmod), Ptr{CHOLMOD.C_SparseVoid},
         (Csize_t, Csize_t, Csize_t, Cint, Cint, Cint, Cint, Ptr{Cvoid}),
         1, 1, 1, true, true, 0, CHOLMOD.REAL, CHOLMOD.common_struct)
     puint = convert(Ptr{UInt32}, p)
@@ -264,7 +264,7 @@ end
 end
 
 @testset "illegal itype II" begin
-    p = ccall((:cholmod_l_allocate_sparse, :libcholmod), Ptr{CHOLMOD.C_SparseVoid},
+    p = ccall((:cholmod_l_allocate_sparse, CHOLMOD.libcholmod), Ptr{CHOLMOD.C_SparseVoid},
         (Csize_t, Csize_t, Csize_t, Cint, Cint, Cint, Cint, Ptr{Cvoid}),
         1, 1, 1, true, true, 0, CHOLMOD.REAL, CHOLMOD.common_struct)
     puint = convert(Ptr{UInt32}, p)
@@ -315,7 +315,7 @@ end
 
 # Test Sparse and Factor
 @testset "test free_sparse!" begin
-    p = ccall((:cholmod_l_allocate_sparse, :libcholmod), Ptr{CHOLMOD.C_Sparse{Float64}},
+    p = ccall((:cholmod_l_allocate_sparse, CHOLMOD.libcholmod), Ptr{CHOLMOD.C_Sparse{Float64}},
         (Csize_t, Csize_t, Csize_t, Cint, Cint, Cint, Cint, Ptr{Cvoid}),
         1, 1, 1, true, true, 0, CHOLMOD.REAL, CHOLMOD.common_struct)
     @test CHOLMOD.free_sparse!(p)
@@ -330,8 +330,8 @@ end
     A1pdSparse = CHOLMOD.Sparse(
         A1pd.m,
         A1pd.n,
-        SuiteSparse.decrement(A1pd.colptr),
-        SuiteSparse.decrement(A1pd.rowval),
+        SuiteSparseNext.decrement(A1pd.colptr),
+        SuiteSparseNext.decrement(A1pd.rowval),
         A1pd.nzval)
 
     ## High level interface
@@ -591,7 +591,7 @@ end
         Asp = As[p,p]
         LDp = sparse(ldlt(Asp, perm=[1,2,3]).LD)
         # LDp = sparse(Fs.LD)
-        Lp, dp = SuiteSparse.CHOLMOD.getLd!(copy(LDp))
+        Lp, dp = SuiteSparseNext.CHOLMOD.getLd!(copy(LDp))
         Dp = sparse(Diagonal(dp))
         @test Fs\b ≈ Af\b
         @test Fs.UP\(Fs.PtLD\b) ≈ Af\b

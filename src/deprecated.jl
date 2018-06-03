@@ -1,7 +1,7 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
 # A[ct]_(mul|ldiv|rdiv)_B[ct][!] methods from src/cholmod.jl, to deprecate
-@eval SuiteSparse.CHOLMOD begin
+@eval SuiteSparseNext.CHOLMOD begin
     Base.Ac_ldiv_B(A::RealHermSymComplexHermF64SSL, B::StridedVecOrMat) = \(adjoint(A), B)
     Base.Ac_ldiv_B(L::Factor, B::Dense) = \(adjoint(L), B)
     Base.Ac_ldiv_B(L::Factor, B::VecOrMat) = \(adjoint(L), B)
@@ -16,7 +16,7 @@
 end
 
 # A[ct]_(mul|ldiv|rdiv)_B[ct][!] methods from src/umfpack.jl, to deprecate
-@eval SuiteSparse.UMFPACK begin
+@eval SuiteSparseNext.UMFPACK begin
     using LinearAlgebra: Adjoint, Transpose
     LinearAlgebra.A_ldiv_B!(X::StridedVecOrMat{T}, lu::UmfpackLU{T}, B::StridedVecOrMat{T}) where {T<:UMFVTypes} =
         LinearAlgebra.ldiv!(X, lu, B)
@@ -39,7 +39,7 @@ end
 end
 
 # A[ct]_(mul|ldiv|rdiv)_B[ct][!] methods from src/spqr.jl, to deprecate
-@eval SuiteSparse.SPQR begin
+@eval SuiteSparseNext.SPQR begin
     using LinearAlgebra: Adjoint, Transpose
     LinearAlgebra.A_mul_Bc!(A::StridedMatrix, Q::QRSparseQ) = LinearAlgebra.mul!(A, adjoint(Q))
     LinearAlgebra.Ac_mul_B!(Q::QRSparseQ, A::StridedVecOrMat) = LinearAlgebra.mul!(adjoint(Q), A)
@@ -48,7 +48,7 @@ end
 end
 
 # deprecate lufact to lu
-@eval SuiteSparse.UMFPACK begin
+@eval SuiteSparseNext.UMFPACK begin
     @deprecate(lufact(A::SparseMatrixCSC), lu(A))
     @deprecate(lufact(S::SparseMatrixCSC{<:UMFVTypes,<:UMFITypes}), lu(S))
     @deprecate(lufact(A::SparseMatrixCSC{<:Union{Float16,Float32},Ti}) where {Ti<:UMFITypes}, lu(A))
@@ -57,14 +57,14 @@ end
 end
 
 # deprecate qrfact to qr
-@eval SuiteSparse.SPQR begin
+@eval SuiteSparseNext.SPQR begin
     import LinearAlgebra: qrfact
     @deprecate(qrfact(A::SparseMatrixCSC{Tv}; tol = _default_tol(A)) where {Tv<:Union{ComplexF64,Float64}}, qr(A; tol=tol))
     @deprecate(qrfact(A::SparseMatrixCSC; tol = _default_tol(A)), qr(A; tol=tol))
 end
 
 # deprecate ldltfact to ldlt
-@eval SuiteSparse.CHOLMOD begin
+@eval SuiteSparseNext.CHOLMOD begin
     import LinearAlgebra: ldltfact
     @deprecate(ldltfact(A::Sparse; shift::Real=0.0, perm::AbstractVector{SuiteSparse_long}=SuiteSparse_long[]), ldlt(A; shift=shift, perm=perm))
     @deprecate(ldltfact(A::Union{SparseMatrixCSC{T},SparseMatrixCSC{Complex{T}},
@@ -76,7 +76,7 @@ end
 end
 
 # deprecate ldltfact! to ldlt!
-@eval SuiteSparse.CHOLMOD begin
+@eval SuiteSparseNext.CHOLMOD begin
     import LinearAlgebra: ldltfact!
     @deprecate(ldltfact!(F::Factor{Tv}, A::Sparse{Tv}; shift::Real=0.0) where Tv, ldlt!(F, A; shift=shift))
     @deprecate(ldltfact!(F::Factor, A::Union{SparseMatrixCSC{T},
@@ -89,7 +89,7 @@ end
 end
 
 # deprecate cholfact to cholesky
-@eval SuiteSparse.CHOLMOD begin
+@eval SuiteSparseNext.CHOLMOD begin
     import LinearAlgebra: cholfact
     @deprecate(cholfact(A::Sparse; shift::Real=0.0, perm::AbstractVector{SuiteSparse_long}=SuiteSparse_long[]), cholesky(A; shift=shift, perm=perm))
     @deprecate(cholfact(A::Union{SparseMatrixCSC{T}, SparseMatrixCSC{Complex{T}},
@@ -101,7 +101,7 @@ end
 end
 
 # deprecate cholfact! to cholesky!
-@eval SuiteSparse.CHOLMOD begin
+@eval SuiteSparseNext.CHOLMOD begin
     import LinearAlgebra: cholfact!
     @deprecate(cholfact!(F::Factor{Tv}, A::Sparse{Tv}; shift::Real=0.0) where Tv, cholesky!(F, A; shift=shift))
     @deprecate(cholfact!(F::Factor, A::Union{SparseMatrixCSC{T},

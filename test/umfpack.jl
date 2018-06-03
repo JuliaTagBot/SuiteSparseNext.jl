@@ -7,7 +7,7 @@
 
     # based on deps/Suitesparse-4.0.2/UMFPACK/Demo/umfpack_di_demo.c
 
-    using SuiteSparse: increment!
+    using SuiteSparseNext: increment!
     using LinearAlgebra: Adjoint, Transpose
 
     A0 = sparse(increment!([0,4,1,1,2,2,0,1,2,3,4,4]),
@@ -16,7 +16,7 @@
 
     @testset "Core functionality for $Tv elements" for Tv in (Float64, ComplexF64)
         # We might be able to support two index sizes one day
-        for Ti in Base.uniontypes(SuiteSparse.UMFPACK.UMFITypes)
+        for Ti in Base.uniontypes(SuiteSparseNext.UMFPACK.UMFITypes)
             A = convert(SparseMatrixCSC{Tv,Ti}, A0)
             lua = lu(A)
             @test nnz(lua) == 18
@@ -74,7 +74,7 @@
 
     @testset "More tests for complex cases" begin
         Ac0 = complex.(A0,A0)
-        for Ti in Base.uniontypes(SuiteSparse.UMFPACK.UMFITypes)
+        for Ti in Base.uniontypes(SuiteSparseNext.UMFPACK.UMFITypes)
             Ac = convert(SparseMatrixCSC{ComplexF64,Ti}, Ac0)
             x  = fill(1.0 + im, size(Ac,1))
             lua = lu(Ac)
@@ -143,9 +143,9 @@
 
     @testset "Test aliasing" begin
         a = rand(5)
-        @test_throws ArgumentError SuiteSparse.UMFPACK.solve!(a, lu(sparse(1.0I, 5, 5)), a, SuiteSparse.UMFPACK.UMFPACK_A)
+        @test_throws ArgumentError SuiteSparseNext.UMFPACK.solve!(a, lu(sparse(1.0I, 5, 5)), a, SuiteSparseNext.UMFPACK.UMFPACK_A)
         aa = complex(a)
-        @test_throws ArgumentError SuiteSparse.UMFPACK.solve!(aa, lu(sparse((1.0im)I, 5, 5)), aa, SuiteSparse.UMFPACK.UMFPACK_A)
+        @test_throws ArgumentError SuiteSparseNext.UMFPACK.solve!(aa, lu(sparse((1.0im)I, 5, 5)), aa, SuiteSparseNext.UMFPACK.UMFPACK_A)
     end
 
     @testset "Issues #18246,18244 - lu sparse pivot" begin

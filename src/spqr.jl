@@ -5,6 +5,8 @@ module SPQR
 import Base: \
 using LinearAlgebra
 
+const libspqr = joinpath(@__DIR__, "..", "deps", "usr", "lib", "libspqr")
+
 # ordering options */
 const ORDERING_FIXED   = Int32(0)
 const ORDERING_NATURAL = Int32(1)
@@ -23,8 +25,8 @@ const ORDERING_BESTAMD = Int32(9) # try COLAMD and AMD; pick best#
 # the best of AMD and METIS. METIS is not tried if it isn't installed.
 
 using SparseArrays: SparseMatrixCSC
-using ..SuiteSparse.CHOLMOD
-using ..SuiteSparse.CHOLMOD: change_stype!, free!
+using ..SuiteSparseNext.CHOLMOD
+using ..SuiteSparseNext.CHOLMOD: change_stype!, free!
 
 function _qr!(ordering::Integer, tol::Real, econ::Integer, getCTX::Integer,
         A::Sparse{Tv},
@@ -40,7 +42,7 @@ function _qr!(ordering::Integer, tol::Real, econ::Integer, getCTX::Integer,
 
     AA   = unsafe_load(pointer(A))
     m, n = AA.nrow, AA.ncol
-    rnk  = ccall((:SuiteSparseQR_C, :libspqr), CHOLMOD.SuiteSparse_long,
+    rnk  = ccall((:SuiteSparseQR_C, libspqr), CHOLMOD.SuiteSparse_long,
         (Cint, Cdouble, CHOLMOD.SuiteSparse_long, Cint,
          Ptr{CHOLMOD.C_Sparse{Tv}}, Ptr{CHOLMOD.C_Sparse{Tv}}, Ptr{CHOLMOD.C_Dense{Tv}},
          Ptr{Ptr{CHOLMOD.C_Sparse{Tv}}}, Ptr{Ptr{CHOLMOD.C_Dense{Tv}}}, Ptr{Ptr{CHOLMOD.C_Sparse{Tv}}},
@@ -78,7 +80,7 @@ function _qr!(ordering::Integer, tol::Real, econ::Integer, getCTX::Integer,
         # Free memory allocated by SPQR. This call will make sure that the
         # correct deallocator function is called and that the memory count in
         # the common struct is updated
-        ccall((:cholmod_l_free, :libcholmod), Cvoid,
+        ccall((:cholmod_l_free, CHOLMOD.libcholmod), Cvoid,
             (Csize_t, Cint, Ptr{CHOLMOD.SuiteSparse_long}, Ptr{Cvoid}),
             n, sizeof(CHOLMOD.SuiteSparse_long), e, CHOLMOD.common_struct)
     end
@@ -93,7 +95,7 @@ function _qr!(ordering::Integer, tol::Real, econ::Integer, getCTX::Integer,
         # Free memory allocated by SPQR. This call will make sure that the
         # correct deallocator function is called and that the memory count in
         # the common struct is updated
-        ccall((:cholmod_l_free, :libcholmod), Cvoid,
+        ccall((:cholmod_l_free, CHOLMOD.libcholmod), Cvoid,
             (Csize_t, Cint, Ptr{CHOLMOD.SuiteSparse_long}, Ptr{Cvoid}),
             m, sizeof(CHOLMOD.SuiteSparse_long), hpinv, CHOLMOD.common_struct)
     end

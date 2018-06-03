@@ -1,7 +1,7 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
-using SuiteSparse.SPQR
-using SuiteSparse.CHOLMOD
+using SuiteSparseNext.SPQR
+using SuiteSparseNext.CHOLMOD
 using LinearAlgebra: rmul!, lmul!, Adjoint, Transpose
 
 @testset "Sparse QR" begin
